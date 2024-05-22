@@ -1,5 +1,5 @@
 {
-  "name": "trial-app-oidc",
+  "name": "oidc-client-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",

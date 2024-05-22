@@ -3,6 +3,7 @@ import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useAuth } from 'react-oidc-context';
+import { appConfig } from '../config';
 
 const Resources = () => {
   const auth = useAuth();
@@ -10,7 +11,7 @@ const Resources = () => {
 
   const getResouces = () => {
     const bearer = `Bearer ${auth.user?.access_token.toString()}`;
-    fetch('https://jtutvacfl1.execute-api.ap-northeast-1.amazonaws.com/Demo?name=tactna', {
+    fetch(`${appConfig.resourceServerUri}?name=tactna`, {
       method: "GET",
       mode: "cors",
       headers: {
