@@ -1,33 +1,14 @@
-import { useAuth } from "react-oidc-context";
+import { RouterProvider } from "react-router-dom";
+import { CssBaseline } from "@mui/material";
+import { ThemeProvider } from "@emotion/react";
+import theme from "./theme";
+import router from "./router";
 
-function App() {
-    const auth = useAuth();
-
-    switch (auth.activeNavigator) {
-        case "signinSilent":
-            return <div>Signing you in...</div>;
-        case "signoutRedirect":
-            return <div>Signing you out...</div>;
-    }
-
-    if (auth.isLoading) {
-        return <div>Loading...</div>;
-    }
-
-    if (auth.error) {
-        return <div>Oops... {auth.error.message}</div>;
-    }
-
-    if (auth.isAuthenticated) {
-        return (
-        <div>
-            Hello {auth.user?.profile.sub}{" "}
-            <button onClick={() => void auth.removeUser()}>Log out</button>
-        </div>
-        );
-    }
-
-    return <button onClick={() => void auth.signinRedirect()}>Log in</button>;
-}
+export const App = () => (
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <RouterProvider router={router} />
+  </ThemeProvider>
+);
 
 export default App;

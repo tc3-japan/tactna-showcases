@@ -1,4 +1,11 @@
-import { Box, Container, Stack, TextField } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Container,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Outlet } from "react-router-dom";
 import AppBar from "../components/AppBar";
 import Copyright from "../components/Copyright";
@@ -11,8 +18,57 @@ import { buildSignInArgs } from "../utils";
 export const Layout = () => {
   const auth = useAuth();
   const search = useLocation().search;
-  const [teamId, setTeamId] = useState<string>((new URLSearchParams(search)).get("teamId") ?? "");
+  const [teamId, setTeamId] = useState<string>(
+    new URLSearchParams(search).get("teamId") ?? ""
+  );
   const [jti, setJti] = useState<string>("");
+
+  // const authDisplay = () => {
+  switch (auth.activeNavigator) {
+    case "signinSilent":
+      return (
+        <LoadingModal open={true}>
+          <Typography margin={3} color={"white"}>
+            Signing you in...
+          </Typography>
+        </LoadingModal>
+      );
+    case "signoutRedirect":
+      return (
+        <LoadingModal open={true}>
+          <Typography margin={3} color={"white"}>
+            Signing you out...
+          </Typography>
+        </LoadingModal>
+      );
+  }
+
+  if (auth.isLoading) {
+    return (
+      <LoadingModal open={true}>
+        <Typography margin={3} color={"white"}>
+          Loading...
+        </Typography>
+      </LoadingModal>
+    );
+  }
+
+  if (auth.error) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <Alert severity="error">
+          Oops...
+          <br />
+          {auth.error?.message ?? "Something went wrong here."}
+        </Alert>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "colors.lightGray" }}>

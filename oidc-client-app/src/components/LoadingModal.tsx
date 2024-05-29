@@ -1,15 +1,22 @@
-import { CircularProgress, Modal, ModalProps } from '@mui/material';
+import { Box, CircularProgress, Grid, Modal, ModalProps } from "@mui/material";
 
-const LoadingModal = (props: Omit<ModalProps, 'children'>) => {
+type OmitModalProps = Omit<ModalProps, "children">;
+interface LoadingModalProps extends OmitModalProps {
+  children?: React.ReactNode;
+}
+
+const LoadingModal = (props: LoadingModalProps) => {
   return (
-    <Modal
-      sx={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-      }}
-      {...props}>
-      <CircularProgress sx={{ outline: 'none' }} />
+    <Modal {...props}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <CircularProgress />
+        {props.children}
+      </Box>
     </Modal>
   );
 };
