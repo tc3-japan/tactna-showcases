@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid, Modal, ModalProps } from "@mui/material";
+import { Box, CircularProgress, Modal, ModalProps } from "@mui/material";
 
 type OmitModalProps = Omit<ModalProps, "children">;
 interface LoadingModalProps extends OmitModalProps {
