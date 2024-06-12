@@ -1,4 +1,4 @@
-# OIDC Client App
+# OIDC Client React App
 
 This project is an exmaple of OIDC client based on [react-oidc-context](https://github.com/authts/react-oidc-context)
 
