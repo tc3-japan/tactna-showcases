@@ -15,7 +15,7 @@ export const oidcConfig: AuthProviderProps = {
   redirect_uri: redirectUri,
   post_logout_redirect_uri: postLogoutRedirectUri,
   scope: 'openid',
-  // fetchRequestCredentials: 'include',
+  fetchRequestCredentials: 'include',
 };
 
 export const appConfig = {
