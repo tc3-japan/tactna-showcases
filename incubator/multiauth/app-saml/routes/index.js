@@ -20,7 +20,7 @@ router.post('/callback', passport.authenticate('saml', { failureRedirect: '/', f
 router.get('/logout', function (req, res) {
   req.logout();
   const returnToUrl = url.format({
-    protocol: process.env.PROTOCOL || 'https' + '://',
+    protocol: process.env.PROTOCOL || 'https',
     host: req.get('host'),
     pathname: req.baseUrl
   });
