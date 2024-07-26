@@ -25,11 +25,12 @@ Resources:
       - x86_64
       Environment:
         Variables:
-          CLIENT_ID: ""
+          CLIENT_ID: "ap-northeast-1_BwY6KKvmD:3m38br796rmaaqn7d42sk30h24"
           CLIENT_SECRET: ""
-          ISSUER_URL: "https://api.tactna.gigops-dev.net"
-          TOKEN_URL: "https://api.tactna.gigops-dev.net/oauth2/token"
+          ISSUER_URL: "https://login.tactna.gigops-dev.net"
+          TOKEN_URL: "https://login.tactna.gigops-dev.net/oauth2/token"
           RESOURCE_URL: "https://showcase.tactna.gigops-dev.net/?name=tactna"
+          AUDIENCE: "https://showcase.tactna.gigops-dev.net"
       Events:
         OidcClient:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api

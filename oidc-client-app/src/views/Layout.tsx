@@ -21,7 +21,7 @@ export const Layout = () => {
   const [teamId, setTeamId] = useState<string>(
     new URLSearchParams(search).get("teamId") ?? ""
   );
-  const [jti, setJti] = useState<string>("");
+  const [aud, setAud] = useState<string>("");
 
   // const authDisplay = () => {
   switch (auth.activeNavigator) {
@@ -74,7 +74,7 @@ export const Layout = () => {
     <Box sx={{ minHeight: "100vh", bgcolor: "colors.lightGray" }}>
       <AppBar
         isAuthenticated={auth.isAuthenticated}
-        onClickLogin={() => auth.signinRedirect(buildSignInArgs(teamId, jti))}
+        onClickLogin={() => auth.signinRedirect(buildSignInArgs(teamId, aud))}
         onClickLogout={() => auth.signoutRedirect({ redirectTarget: "self" })}
       />
       {!auth.isAuthenticated && (
@@ -86,9 +86,9 @@ export const Layout = () => {
             sx={{ width: "340px" }}
           />
           <TextField
-            value={jti}
-            onChange={(e) => setJti(e.target.value)}
-            placeholder="jti"
+            value={aud}
+            onChange={(e) => setAud(e.target.value)}
+            placeholder="aud"
             sx={{ width: "340px" }}
           />
         </Stack>

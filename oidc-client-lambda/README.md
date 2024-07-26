@@ -14,6 +14,7 @@ Following environment variables required:
 - ISSUER_URL
 - TOKEN_URL
 - RESOURCE_URL
+- AUDIENCE
 
 `template.yaml` to run locally
 

@@ -8,16 +8,21 @@ def lambda_handler(event, context):
     client_secret = os.getenv('CLIENT_SECRET')
     token_url = os.getenv('TOKEN_URL')
     resource_url = os.getenv('RESOURCE_URL')
+    audience = os.getenv('AUDIENCE')
     if not all([client_id, client_secret, token_url, resource_url]):
         return {
             'statusCode': 500,
             'body': json.dumps('Missing required environment variables')
         }
 
+    additional_data = {
+        'aud': audience
+    }
+
     try:
         # token request
         client = OAuth2Session(client_id, client_secret, token_endpoint_auth_method='client_secret_post')
-        token = client.fetch_token(url=token_url, grant_type='client_credentials')
+        token = client.fetch_token(url=token_url, grant_type='client_credentials', **additional_data)
         print(f"Token: {token}")
 
         # resource request
