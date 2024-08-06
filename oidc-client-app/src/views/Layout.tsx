@@ -14,6 +14,7 @@ import { useAuth } from "react-oidc-context";
 import { useState } from "react";
 import { useLocation } from "react-router";
 import { buildSignInArgs } from "../utils";
+import { appConfig } from "../config";
 
 export const Layout = () => {
   const auth = useAuth();
@@ -76,6 +77,9 @@ export const Layout = () => {
         isAuthenticated={auth.isAuthenticated}
         onClickLogin={() => auth.signinRedirect(buildSignInArgs(teamId, aud))}
         onClickLogout={() => auth.signoutRedirect({ redirectTarget: "self" })}
+        onClickSignup={() => {
+          window.location.href = `${appConfig.signupEndpoint}?client_id=${appConfig.clientId}&redirect_uri=${appConfig.postSignupRedirectUri}`
+        }}
       />
       {!auth.isAuthenticated && (
         <Stack direction="column" alignItems="flex-end">
