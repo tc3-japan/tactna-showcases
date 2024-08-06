@@ -1,4 +1,4 @@
-import { AppBar, AppBarProps, Button, Toolbar, Input, useTheme } from '@mui/material';
+import { AppBar, AppBarProps, Button, Toolbar, useTheme } from '@mui/material';
 import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -30,13 +30,9 @@ export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, onC
             </Button>
           )}
           {!isAuthenticated && appConfig.signupEndpoint && (<>
-            <form method="POST" action={appConfig.signupEndpoint}>
-              <Input type="hidden" name="client_id" id="client_id" value={appConfig.clientId} />
-              <Input type="hidden" name="redirect_url" id="redirect_url" value={appConfig.postSignupRedirectUri} />
-              <Button onClick={onClickSignup}>
-                Signup
-              </Button>
-            </form>
+            <Button onClick={onClickSignup}>
+              Signup
+            </Button>
           </>)}
           {isAuthenticated && (
             <Button component={Link} to="/resources">
