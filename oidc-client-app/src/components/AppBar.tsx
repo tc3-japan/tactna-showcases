@@ -8,9 +8,10 @@ export interface CustomAppBarProps extends AppBarProps {
   isAuthenticated: boolean;
   onClickLogin: React.MouseEventHandler<HTMLButtonElement>;
   onClickLogout: React.MouseEventHandler<HTMLButtonElement>;
+  onClickSignup: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, ...appBarProps }: CustomAppBarProps) => {
+export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, onClickSignup, ...appBarProps }: CustomAppBarProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const logo = isMobile ? '/logo.svg' : '/logo-with-text.svg';
@@ -32,7 +33,7 @@ export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, ...
             <form method="POST" action={appConfig.signupEndpoint}>
               <Input type="hidden" name="client_id" id="client_id" value={appConfig.clientId} />
               <Input type="hidden" name="redirect_url" id="redirect_url" value={appConfig.postSignupRedirectUri} />
-              <Button type="submit">
+              <Button onClick={onClickSignup}>
                 Signup
               </Button>
             </form>
