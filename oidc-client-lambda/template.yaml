@@ -25,10 +25,10 @@ Resources:
       - x86_64
       Environment:
         Variables:
-          CLIENT_ID: "ap-northeast-1_BwY6KKvmD:3m38br796rmaaqn7d42sk30h24"
+          CLIENT_ID: "ap-northeast-1_BwY6KKvmD:18549a8bu76qvbfuqs7i9a2iha"
           CLIENT_SECRET: ""
-          ISSUER_URL: "https://login.tactna.gigops-dev.net"
-          TOKEN_URL: "https://login.tactna.gigops-dev.net/oauth2/token"
+          ISSUER_URL: "https://login.wrl57clqjbcy.tactna.gigops-dev.net"
+          TOKEN_URL: "https://login.wrl57clqjbcy.tactna.gigops-dev.net/oauth2/token"
           RESOURCE_URL: "https://showcase.tactna.gigops-dev.net/?name=tactna"
           AUDIENCE: "https://showcase.tactna.gigops-dev.net"
       Events:
