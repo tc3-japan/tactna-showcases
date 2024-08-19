@@ -16,7 +16,7 @@ def lambda_handler(event, context):
         }
 
     additional_data = {
-        'aud': audience
+        'audience': audience
     }
 
     try:

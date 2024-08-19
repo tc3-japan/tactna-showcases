@@ -12,17 +12,11 @@ import Copyright from "../components/Copyright";
 import LoadingModal from "../components/LoadingModal";
 import { useAuth } from "react-oidc-context";
 import { useState } from "react";
-import { useLocation } from "react-router";
-import { buildSignInArgs } from "../utils";
 import { appConfig } from "../config";
 
 export const Layout = () => {
   const auth = useAuth();
-  const search = useLocation().search;
-  const [teamId, setTeamId] = useState<string>(
-    new URLSearchParams(search).get("teamId") ?? ""
-  );
-  const [aud, setAud] = useState<string>("");
+  const [audience, setAudience] = useState<string>(appConfig.audience ?? "");
 
   // const authDisplay = () => {
   switch (auth.activeNavigator) {
@@ -75,7 +69,11 @@ export const Layout = () => {
     <Box sx={{ minHeight: "100vh", bgcolor: "colors.lightGray" }}>
       <AppBar
         isAuthenticated={auth.isAuthenticated}
-        onClickLogin={() => auth.signinRedirect(buildSignInArgs(teamId, aud))}
+        onClickLogin={() => {
+          auth.signinRedirect(
+            audience ? { extraQueryParams: { audience } } : undefined
+          );
+        }}
         onClickLogout={() => auth.signoutRedirect({ redirectTarget: "self" })}
         onClickSignup={() => {
           window.location.href = `${appConfig.signupEndpoint}?client_id=${appConfig.clientId}&redirect_uri=${appConfig.postSignupRedirectUri}`
@@ -84,15 +82,9 @@ export const Layout = () => {
       {!auth.isAuthenticated && (
         <Stack direction="column" alignItems="flex-end">
           <TextField
-            value={teamId}
-            onChange={(e) => setTeamId(e.target.value)}
-            placeholder="teamId"
-            sx={{ width: "340px" }}
-          />
-          <TextField
-            value={aud}
-            onChange={(e) => setAud(e.target.value)}
-            placeholder="aud"
+            value={audience}
+            onChange={(e) => setAudience(e.target.value)}
+            placeholder="audience"
             sx={{ width: "340px" }}
           />
         </Stack>

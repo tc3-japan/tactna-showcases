@@ -8,6 +8,7 @@ const postLogoutRedirectUri = import.meta.env.VITE_OIDC_REDIRECT_SIGN_OUT || win
 const signupEndpoint = import.meta.env.VITE_SIGNUP_ENDPOINT;
 const postSignupRedirectUri = import.meta.env.VITE_REDIRECT_SIGN_UP;
 const resourceServerUri = assert(import.meta.env.VITE_RESOURCE_SERVER_URI);
+const audience = import.meta.env.VITE_AUDIENCE;
 
 export const oidcConfig: AuthProviderProps = {
   authority,
@@ -15,7 +16,6 @@ export const oidcConfig: AuthProviderProps = {
   redirect_uri: redirectUri,
   post_logout_redirect_uri: postLogoutRedirectUri,
   scope: 'openid',
-  fetchRequestCredentials: 'include',
 };
 
 export const appConfig = {
@@ -23,4 +23,5 @@ export const appConfig = {
   signupEndpoint,
   postSignupRedirectUri: postSignupRedirectUri,
   resourceServerUri,
+  audience,
 }
