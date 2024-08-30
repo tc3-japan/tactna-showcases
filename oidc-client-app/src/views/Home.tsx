@@ -5,7 +5,7 @@ export const Home = () => {
     <Stack alignItems="center" spacing={2}>
       <img src="/react.svg" alt="React logo" height={80} />
       <Typography variant="h5">Tactna Sample App</Typography>
-      <p>ver. 20240806_1730</p>
+      <p>ver. 20240824_1810</p>
     </Stack>
   );
 };
