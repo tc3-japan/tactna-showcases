@@ -1,7 +1,7 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button, Stack, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { appConfig } from '../config';
 
@@ -31,6 +31,10 @@ const Resources = () => {
       console.log(error);
     });
   };
+
+  useEffect(() => {
+    getResouces();
+  }, []);
 
   return (
     <Stack spacing={2}>
