@@ -1,17 +1,19 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Stack, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { appConfig } from '../config';
 
 const Resources = () => {
   const auth = useAuth();
+  const query = new URLSearchParams(window.location.search);
   const [foos, setFoos] = useState({});
+  const [name, setName] = useState(query.get('name') || 'world');
 
   const getResouces = () => {
     const bearer = `Bearer ${auth.user?.access_token.toString()}`;
-    fetch(`${appConfig.resourceServerUri}?name=tactna`, {
+    fetch(`${appConfig.resourceServerUri}?name=${name}`, {
       method: "GET",
       mode: "cors",
       headers: {
@@ -36,6 +38,7 @@ const Resources = () => {
       <SyntaxHighlighter language="json" style={dracula}>
         {JSON.stringify(foos)}
       </SyntaxHighlighter>
+      <TextField value={name} label="Name" onChange={(e) => setName(e.currentTarget.value)}/>
       <Button variant="contained" color="primary" onClick={getResouces}>
         Get Resources
       </Button>

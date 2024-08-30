@@ -6,10 +6,14 @@ import Profile from './views/Profile';
 import Home from './views/Home';
 import Resources from './views/Resources';
 import LoadingModal from './components/LoadingModal';
-import Login from './views/Login';
+import { appConfig } from './config';
 
 const props: WithAuthenticationRequiredProps = {
   OnRedirecting: () => <LoadingModal open={true} />,
+  signinRedirectArgs: {
+    redirect_uri: window.location.href,
+    extraQueryParams: { audience: appConfig.audience },
+  },
 };
 
 const routes: RouteObject[] = [
@@ -28,10 +32,6 @@ const routes: RouteObject[] = [
       {
         path: '/resources',
         Component: withAuthenticationRequired(Resources, props),
-      },
-      {
-        path: '/login',
-        Component: Login,
       }
     ],
   },
