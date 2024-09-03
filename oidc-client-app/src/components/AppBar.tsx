@@ -44,6 +44,11 @@ export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, onC
               Profile
             </Button>
           )}
+          {isAuthenticated && (
+            <Button component={Link} to="/links">
+              Links
+            </Button>
+          )}
           {isAuthenticated && <Button onClick={onClickLogout}>Logout</Button>}
         </Toolbar>
       </AppBar>

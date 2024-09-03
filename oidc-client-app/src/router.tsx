@@ -6,6 +6,7 @@ import Profile from './views/Profile';
 import Home from './views/Home';
 import Resources from './views/Resources';
 import LoadingModal from './components/LoadingModal';
+import { Links } from './views/Links';
 import { appConfig } from './config';
 
 const props: WithAuthenticationRequiredProps = {
@@ -32,6 +33,10 @@ const routes: RouteObject[] = [
       {
         path: '/resources',
         Component: withAuthenticationRequired(Resources, props),
+      },
+      {
+        path: '/links',
+        Component: withAuthenticationRequired(Links, props),
       }
     ],
   },
