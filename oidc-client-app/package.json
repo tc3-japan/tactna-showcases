@@ -8,6 +8,7 @@
     "start": "serve -s build",
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:debug": "tsc && vite build --sourcemap",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
     "preview": "vite preview",
