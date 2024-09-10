@@ -1,5 +1,4 @@
 import {
-  Alert,
   Box,
   Container,
   Stack,
@@ -45,23 +44,6 @@ export const Layout = () => {
           Loading...
         </Typography>
       </LoadingModal>
-    );
-  }
-
-  if (auth.error) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
-        <Alert severity="error">
-          Oops...
-          <br />
-          {auth.error?.message ?? "Something went wrong here."}
-        </Alert>
-      </Box>
     );
   }
 

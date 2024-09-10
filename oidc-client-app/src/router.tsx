@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import { RouteObject, createBrowserRouter } from 'react-router-dom';
 import { WithAuthenticationRequiredProps, withAuthenticationRequired } from "react-oidc-context";
 
@@ -8,6 +9,8 @@ import Resources from './views/Resources';
 import LoadingModal from './components/LoadingModal';
 import { Links } from './views/Links';
 import { appConfig } from './config';
+import Error from './views/Error';
+import ErrorChecker from './components/ErrorChecker'; 
 
 const props: WithAuthenticationRequiredProps = {
   OnRedirecting: () => <LoadingModal open={true} />,
@@ -20,24 +23,35 @@ const props: WithAuthenticationRequiredProps = {
 const routes: RouteObject[] = [
   {
     path: '/',
-    Component: Layout,
+    element: <ErrorChecker />,
     children: [
       {
         path: '/',
-        Component: Home,
+        element: <Layout />,
+        children: [
+          {
+            path: '/',
+            element: <Home />,
+          },
+          {
+            path: 'profile',
+            element: createElement(withAuthenticationRequired(Profile, props)), 
+          },
+          {
+            path: 'resources',
+            element: createElement(withAuthenticationRequired(Resources, props)), 
+          },
+          {
+            path: 'links',
+            element: createElement(withAuthenticationRequired(Links, props)),
+          }
+        ],
       },
+      // Error page route
       {
-        path: '/profile',
-        Component: withAuthenticationRequired(Profile, props),
+        path: 'error',
+        element: <Error />,
       },
-      {
-        path: '/resources',
-        Component: withAuthenticationRequired(Resources, props),
-      },
-      {
-        path: '/links',
-        Component: withAuthenticationRequired(Links, props),
-      }
     ],
   },
 ];

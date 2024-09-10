@@ -12,8 +12,6 @@ const Profile = () => {
 
   const handleRefresh = async () => {
     auth.signinSilent();
-    ({ decodedToken: accessToken } = useJwt(auth.user?.access_token || ''));
-    ({ decodedToken: idToken } = useJwt(auth.user?.id_token || ''));
   }
 
   return (
