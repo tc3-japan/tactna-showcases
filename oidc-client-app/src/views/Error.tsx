@@ -3,27 +3,42 @@ import { Container, Typography, Button, Box } from "@mui/material";
 import { useAuth } from "react-oidc-context";
 import { useEffect } from "react";
 
+interface ErrorExtra {
+  error: string;
+  error_description: string;
+}
+
 const Error = () => {
   const auth = useAuth();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
-  const error = params.get("error") || auth.error?.name;
+  const isErrorExtra = (obj: any): obj is ErrorExtra => {
+    return obj && 'error' in obj;
+  };
+
+  let errorExtra: ErrorExtra | undefined;
+  if (isErrorExtra(auth.error)) {
+    errorExtra = auth.error;
+  }
+
+  const error = params.get("error") || errorExtra?.error || auth.error?.name;
   const errorDescription =
     params.get("error_description") ||
+    errorExtra?.error_description ||
     auth.error?.message ||
     "An unknown error occurred.";
 
-    useEffect(() => {
-        if (auth.error) {
-            auth.removeUser();
-        }
-    }, [auth.error]);
+  useEffect(() => {
+    if (auth.error) {
+      auth.removeUser();
+    }
+  }, [auth.error]);
 
   return (
     <Container maxWidth="sm" style={{ marginTop: "50px", textAlign: "center" }}>
-      <Typography variant="h3" gutterBottom>
-        Error
+      <Typography variant="h5" gutterBottom>
+        Error occurred
       </Typography>
       <Typography variant="h4" color="error" gutterBottom>
         {error}
