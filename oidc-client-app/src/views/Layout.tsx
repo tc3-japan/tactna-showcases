@@ -1,7 +1,6 @@
 import {
   Box,
   Container,
-  Divider,
   Stack,
   TextField,
   Typography,
@@ -33,7 +32,7 @@ export const Layout = () => {
       },
       state: redirectUrlOnLogin,
     });
-  }, [audience, teamId, redirectUrlOnLogin]);
+  }, [auth, audience, teamId, redirectUrlOnLogin]);
 
 
 

@@ -1,4 +1,4 @@
-import { AppBar, AppBarProps, Button, Toolbar, useTheme, Divider } from '@mui/material';
+import { AppBar, AppBarProps, Button, Toolbar, Divider } from '@mui/material';
 import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { appConfig } from '../config.tsx';
