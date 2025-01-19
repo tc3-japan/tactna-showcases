@@ -13,6 +13,7 @@ const Error = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isErrorExtra = (obj: any): obj is ErrorExtra => {
     return obj && 'error' in obj;
   };
@@ -33,7 +34,7 @@ const Error = () => {
     if (auth.error) {
       auth.removeUser();
     }
-  }, [auth.error]);
+  }, [auth]);
 
   return (
     <Container maxWidth="sm" style={{ marginTop: "50px", textAlign: "center" }}>

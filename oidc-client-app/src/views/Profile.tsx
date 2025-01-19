@@ -8,8 +8,8 @@ import { useJwt } from "react-jwt";
 const Profile = () => {
   const auth = useAuth();
 
-  let { decodedToken: accessToken } = useJwt(auth.user?.access_token || '');
-  let { decodedToken: idToken } = useJwt(auth.user?.id_token || '');
+  const { decodedToken: accessToken } = useJwt(auth.user?.access_token || '');
+  const { decodedToken: idToken } = useJwt(auth.user?.id_token || '');
 
   const handleRefresh = async () => {
     auth.signinSilent();
