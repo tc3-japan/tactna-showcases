@@ -1,6 +1,7 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography, IconButton } from '@mui/material';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useAuth } from 'react-oidc-context';
 import { useJwt } from "react-jwt";
 
@@ -16,25 +17,31 @@ const Profile = () => {
 
   return (
     <Stack spacing={2}>
-      <Typography variant="h5">User:</Typography>
       <Button variant="contained" color="primary" onClick={ handleRefresh }>
-        Refresh
+        Refresh Token
       </Button>
-      <SyntaxHighlighter language="json" style={dracula}>
-        {JSON.stringify(auth.user, null, 2)}
-      </SyntaxHighlighter>
+      <Typography variant="h5">Access Token:</Typography>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <SyntaxHighlighter style={dracula}>{auth.user?.access_token ?? ''}</SyntaxHighlighter>
+        <IconButton onClick={() => navigator.clipboard.writeText(auth.user?.access_token ?? '')}>
+          <ContentCopyIcon />
+        </IconButton>
+      </Stack>
       <Typography variant="h5">Decoded Access Token:</Typography>
       <SyntaxHighlighter language="json" style={dracula}>
         {JSON.stringify(accessToken, null, 2)}
       </SyntaxHighlighter>
-      <Typography variant="h5">Access Token:</Typography>
-      <SyntaxHighlighter style={dracula}>{auth.user?.access_token ?? ''}</SyntaxHighlighter>
+      <Typography variant="h5">ID Token:</Typography>
+      <Stack direction="row" alignItems="center" spacing={1}>
+      <SyntaxHighlighter style={dracula}>{auth.user?.id_token ?? ''}</SyntaxHighlighter>
+        <IconButton onClick={() => navigator.clipboard.writeText(auth.user?.id_token ?? '')}>
+          <ContentCopyIcon />
+        </IconButton>
+      </Stack>
       <Typography variant="h5">Decoded ID Token:</Typography>
       <SyntaxHighlighter language="json" style={dracula}>
         {JSON.stringify(idToken, null, 2)}
       </SyntaxHighlighter>
-      <Typography variant="h5">ID Token:</Typography>
-      <SyntaxHighlighter style={dracula}>{auth.user?.id_token ?? ''}</SyntaxHighlighter>
     </Stack>
   );
 };

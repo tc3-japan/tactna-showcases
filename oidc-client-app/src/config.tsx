@@ -2,6 +2,7 @@ import { AuthProviderProps } from "react-oidc-context";
 import { assert } from './utils'
 import { User } from "oidc-client-ts";
 
+const appName = import.meta.env.VITE_APP_NAME || "Tactna Sample App";
 const authority = assert(import.meta.env.VITE_OIDC_AUTHORITY);
 const clientId = assert(import.meta.env.VITE_OIDC_CLIENT_ID);
 const redirectUri = import.meta.env.VITE_OIDC_REDIRECT_SIGN_IN || window.location.origin;
@@ -17,16 +18,23 @@ export const oidcConfig: AuthProviderProps = {
   redirect_uri: redirectUri,
   post_logout_redirect_uri: postLogoutRedirectUri,
   scope: 'openid',
-  onSigninCallback: (_user: User | void): void => {
-    window.history.replaceState(
-      {},
-      document.title,
-      window.location.pathname
-    )
+  extraTokenParams: { audience },
+  onSigninCallback: (user: User | void): void => {
+    const redirectUri = user?.state as string | undefined
+    if (redirectUri && redirectUri.match("http(s)://.*")) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      window.location.href = redirectUri;
+      return;
+    }
+    if (redirectUri && redirectUri.length > 0) {
+      window.history.replaceState({}, document.title, redirectUri);
+      window.location.reload()
+    }
   }
 };
 
 export const appConfig = {
+  appName,
   clientId,
   signupEndpoint,
   postSignupRedirectUri: postSignupRedirectUri,
