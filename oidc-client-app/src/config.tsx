@@ -20,12 +20,16 @@ export const oidcConfig: AuthProviderProps = {
   scope: 'openid',
   extraTokenParams: { audience },
   onSigninCallback: (user: User | void): void => {
-    window.history.replaceState(
-      {},
-      document.title,
-      user?.state as string || window.location.pathname
-    )
-    window.location.reload()
+    const redirectUri = user?.state as string | undefined
+    if (redirectUri && redirectUri.match("http(s)://.*")) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      window.location.href = redirectUri;
+      return;
+    }
+    if (redirectUri && redirectUri.length > 0) {
+      window.history.replaceState({}, document.title, redirectUri);
+      window.location.reload()
+    }
   }
 };
 

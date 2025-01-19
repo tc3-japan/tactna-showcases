@@ -33,12 +33,13 @@ export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, onC
             Links
           </Button>
           <Divider orientation="vertical" flexItem />
-          {!isAuthenticated && (
-            <Button onClick={onClickLogin} color="secondary">
-              Login
-            </Button>
-          )}
-          {isAuthenticated && <Button onClick={onClickLogout} color="secondary">Logout</Button>}
+          <Button onClick={onClickLogin} color="secondary">
+            { isAuthenticated ? "Re-Login" : "Login" }
+          </Button>
+          {isAuthenticated && <>
+            <Divider orientation="vertical" flexItem />
+            <Button onClick={onClickLogout} color="secondary">Logout</Button>
+          </>}
           <Divider orientation="vertical" flexItem />
           {appConfig.signupEndpoint && (<>
             <Button onClick={onClickSignup} color="secondary">

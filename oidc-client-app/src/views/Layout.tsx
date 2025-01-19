@@ -11,21 +11,29 @@ import AppBar from "../components/AppBar";
 import Copyright from "../components/Copyright";
 import LoadingModal from "../components/LoadingModal";
 import { useAuth } from "react-oidc-context";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { appConfig } from "../config";
 
 export const Layout = () => {
   const auth = useAuth();
   const [audience, setAudience] = useState<string>(appConfig.audience);
   const [teamId, setTeamId] = useState<string>("");
+  const [redirectUrlOnLogin, setRedirectUrlOnLogin] = useState<string>("");
+  useEffect(() => {
+    const teamId = auth?.user?.profile?.["https://tactna.net/team_id"] as string
+    if (teamId) {
+      setTeamId(teamId);
+    }
+  }, [auth])
   const onClickLogin = useCallback(() => {
-    auth.signinRedirect(
-      { extraQueryParams: {
+    auth.signinRedirect({
+      extraQueryParams: {
         audience: audience,
         team_id: teamId,
-      } },
-    );
-  }, [audience, teamId]);
+      },
+      state: redirectUrlOnLogin,
+    });
+  }, [audience, teamId, redirectUrlOnLogin]);
 
 
 
@@ -69,11 +77,11 @@ export const Layout = () => {
           window.location.href = `${appConfig.signupEndpoint}?client_id=${appConfig.clientId}&redirect_uri=${appConfig.postSignupRedirectUri}`
         }}
       />
-      {!auth.isAuthenticated && (
+      {
         <Stack alignItems="flex-end" sx={{ p: 2 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <Typography variant="h6" gutterBottom>
-            Login Parameters
+            Authentication Parameters
           </Typography>
           <TextField
             label="Audience"
@@ -89,9 +97,16 @@ export const Layout = () => {
             placeholder="892ef6b5-da05-4748-8ea1-cd7cdb567643"
             sx={{ width: "340px" }}
           />
+          <TextField
+            label="Redirect URL on Login"
+            value={redirectUrlOnLogin}
+            onChange={(e) => setRedirectUrlOnLogin(e.target.value)}
+            placeholder="https://example.com"
+            sx={{ width: "340px" }}
+          />
           </Box>
         </Stack>
-      )}
+      }
       <Container sx={{ py: 4 }}>
         <Outlet />
       </Container>

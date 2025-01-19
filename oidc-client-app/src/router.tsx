@@ -15,7 +15,6 @@ import ErrorChecker from './components/ErrorChecker';
 const authProps: (path: string) => WithAuthenticationRequiredProps = (path: string) => ({
   OnRedirecting: () => <LoadingModal open={true} />,
   signinRedirectArgs: {
-    redirect_uri: window.location.href,
     extraQueryParams: { audience: appConfig.audience },
     state: path,
   },
