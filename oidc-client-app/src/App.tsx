@@ -4,11 +4,13 @@ import { ThemeProvider } from "@emotion/react";
 import theme from "./theme";
 import router from "./router";
 
-export const App = () => (
-  <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <RouterProvider router={router} />
-  </ThemeProvider>
-);
+export const App = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <RouterProvider router={router} />
+    </ThemeProvider>
+  );
+};
 
 export default App;

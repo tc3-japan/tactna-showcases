@@ -1,7 +1,6 @@
-import { AppBar, AppBarProps, Button, Toolbar, useTheme } from '@mui/material';
+import { AppBar, AppBarProps, Button, Toolbar, useTheme, Divider } from '@mui/material';
 import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { appConfig } from '../config.tsx';
 
 export interface CustomAppBarProps extends AppBarProps {
@@ -12,44 +11,40 @@ export interface CustomAppBarProps extends AppBarProps {
 }
 
 export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, onClickSignup, ...appBarProps }: CustomAppBarProps) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const logo = isMobile ? '/logo.svg' : '/logo-with-text.svg';
 
   return (
     <Box sx={{ flexGrow: 1 }} {...appBarProps}>
       <AppBar position="static" sx={{ bgcolor: 'common.white' }}>
         <Toolbar>
           <Link to="/">
-            <img src={logo} alt="logo" />
+            <img src="/logo.svg" alt="logo" />
           </Link>
           <Box sx={{ flexGrow: 1 }} />
+          <Divider orientation="vertical" flexItem />
+          <Button component={Link} to="/resources">
+            Resources
+          </Button>
+          <Divider orientation="vertical" flexItem />
+          <Button component={Link} to="/profile">
+            Profile
+          </Button>
+          <Divider orientation="vertical" flexItem />
+          <Button component={Link} to="/links">
+            Links
+          </Button>
+          <Divider orientation="vertical" flexItem />
           {!isAuthenticated && (
-            <Button onClick={onClickLogin}>
+            <Button onClick={onClickLogin} color="secondary">
               Login
             </Button>
           )}
-          {!isAuthenticated && appConfig.signupEndpoint && (<>
-            <Button onClick={onClickSignup}>
+          {isAuthenticated && <Button onClick={onClickLogout} color="secondary">Logout</Button>}
+          <Divider orientation="vertical" flexItem />
+          {appConfig.signupEndpoint && (<>
+            <Button onClick={onClickSignup} color="secondary">
               Signup
             </Button>
           </>)}
-          {isAuthenticated && (
-            <Button component={Link} to="/resources">
-              Resources
-            </Button>
-          )}
-          {isAuthenticated && (
-            <Button component={Link} to="/profile">
-              Profile
-            </Button>
-          )}
-          {isAuthenticated && (
-            <Button component={Link} to="/links">
-              Links
-            </Button>
-          )}
-          {isAuthenticated && <Button onClick={onClickLogout}>Logout</Button>}
         </Toolbar>
       </AppBar>
     </Box>

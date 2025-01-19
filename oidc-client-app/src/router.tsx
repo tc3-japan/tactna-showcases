@@ -12,13 +12,14 @@ import { appConfig } from './config';
 import Error from './views/Error';
 import ErrorChecker from './components/ErrorChecker'; 
 
-const props: WithAuthenticationRequiredProps = {
+const authProps: (path: string) => WithAuthenticationRequiredProps = (path: string) => ({
   OnRedirecting: () => <LoadingModal open={true} />,
   signinRedirectArgs: {
     redirect_uri: window.location.href,
     extraQueryParams: { audience: appConfig.audience },
+    state: path,
   },
-};
+});
 
 const routes: RouteObject[] = [
   {
@@ -35,15 +36,15 @@ const routes: RouteObject[] = [
           },
           {
             path: 'profile',
-            element: createElement(withAuthenticationRequired(Profile, props)), 
+            element: createElement(withAuthenticationRequired(Profile, authProps('profile'))), 
           },
           {
             path: 'resources',
-            element: createElement(withAuthenticationRequired(Resources, props)), 
+            element: createElement(withAuthenticationRequired(Resources, authProps('resources'))), 
           },
           {
             path: 'links',
-            element: createElement(withAuthenticationRequired(Links, props)),
+            element: createElement(withAuthenticationRequired(Links, authProps('links'))),
           }
         ],
       },

@@ -2,6 +2,7 @@ import { AuthProviderProps } from "react-oidc-context";
 import { assert } from './utils'
 import { User } from "oidc-client-ts";
 
+const appName = assert(import.meta.env.VITE_APP_NAME);
 const authority = assert(import.meta.env.VITE_OIDC_AUTHORITY);
 const clientId = assert(import.meta.env.VITE_OIDC_CLIENT_ID);
 const redirectUri = import.meta.env.VITE_OIDC_REDIRECT_SIGN_IN || window.location.origin;
@@ -17,16 +18,19 @@ export const oidcConfig: AuthProviderProps = {
   redirect_uri: redirectUri,
   post_logout_redirect_uri: postLogoutRedirectUri,
   scope: 'openid',
-  onSigninCallback: (_user: User | void): void => {
+  extraTokenParams: { audience },
+  onSigninCallback: (user: User | void): void => {
     window.history.replaceState(
       {},
       document.title,
-      window.location.pathname
+      user?.state as string || window.location.pathname
     )
+    window.location.reload()
   }
 };
 
 export const appConfig = {
+  appName,
   clientId,
   signupEndpoint,
   postSignupRedirectUri: postSignupRedirectUri,
