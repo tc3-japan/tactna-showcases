@@ -8,14 +8,12 @@ import Home from './views/Home';
 import Resources from './views/Resources';
 import LoadingModal from './components/LoadingModal';
 import { Links } from './views/Links';
-import { appConfig } from './config';
 import Error from './views/Error';
 import ErrorChecker from './components/ErrorChecker'; 
 
 const authProps: (path: string) => WithAuthenticationRequiredProps = (path: string) => ({
   OnRedirecting: () => <LoadingModal open={true} />,
   signinRedirectArgs: {
-    extraQueryParams: { audience: appConfig.audience },
     state: path,
   },
 });
