@@ -5,7 +5,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { Outlet } from "react-router-dom";
+import { Outlet, useSearchParams } from "react-router-dom";
 import AppBar from "../components/AppBar";
 import Copyright from "../components/Copyright";
 import LoadingModal from "../components/LoadingModal";
@@ -16,7 +16,8 @@ import { appConfig } from "../config";
 export const Layout = () => {
   const auth = useAuth();
   const [audience, setAudience] = useState<string>(appConfig.audience);
-  const [teamId, setTeamId] = useState<string>("");
+  const [searchParams] = useSearchParams();
+  const [teamId, setTeamId] = useState<string>(searchParams.get("team_id") || "");
   const [redirectUrlOnLogin, setRedirectUrlOnLogin] = useState<string>("");
   useEffect(() => {
     const teamId = auth?.user?.profile?.["https://tactna.net/team_id"] as string
