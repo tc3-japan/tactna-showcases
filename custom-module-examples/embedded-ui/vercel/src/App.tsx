@@ -5,7 +5,7 @@ import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-  const pageName = (new URLSearchParams(window.location.search)).get('pageName');
+  const pageName = (new URLSearchParams(window.location.search)).get('pageName')?.match(/^[a-zA-Z]*/)?.[0];
 
   return (
     <>
