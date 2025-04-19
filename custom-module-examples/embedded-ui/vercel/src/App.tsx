@@ -5,6 +5,7 @@ import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
+  const pageName = (new URLSearchParams(window.location.search)).get('pageName');
 
   return (
     <>
@@ -21,9 +22,11 @@ function App() {
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-        <p>
-          Current URL is "{location.href}"
-        </p>
+        {pageName &&
+          <p>
+            page name is "{pageName}"
+          </p>
+        }
       </div>
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
