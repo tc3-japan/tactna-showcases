@@ -39,7 +39,11 @@ export const Layout = () => {
   }, [auth]);
 
   const signupUrl = useMemo(() => {
-    return `${signupEndpoint}?client_id=${clientId}&redirect_uri=${postSignupRedirectUri}`;
+    const url = new URL(signupEndpoint);
+    url.pathname = "/signup/start";
+    url.searchParams.append("client_id", clientId);
+    url.searchParams.append("redirect_uri", postSignupRedirectUri);
+    return url.toString();
   }, [signupEndpoint, clientId, postSignupRedirectUri]);
 
   // Safety check: if auth is not available yet, show loading
