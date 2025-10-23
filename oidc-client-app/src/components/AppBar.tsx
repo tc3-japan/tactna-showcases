@@ -6,10 +6,12 @@ export interface CustomAppBarProps extends AppBarProps {
   isAuthenticated: boolean;
   onClickLogin: React.MouseEventHandler<HTMLButtonElement>;
   onClickLogout: React.MouseEventHandler<HTMLButtonElement>;
+  onForceLogout: React.MouseEventHandler<HTMLButtonElement>;
   signupUrl: string;
+  signupEndpoint: string;
 }
 
-export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, signupUrl, ...appBarProps }: CustomAppBarProps) => {
+export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, onForceLogout, signupUrl, signupEndpoint, ...appBarProps }: CustomAppBarProps) => {
 
   return (
     <Box sx={{ flexGrow: 1 }} {...appBarProps}>
@@ -40,9 +42,13 @@ export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, sig
             <Button onClick={onClickLogout} color="secondary">Logout</Button>
           </>}
           <Divider orientation="vertical" flexItem />
+          <Button onClick={onForceLogout} color="error">Force Logout</Button>
+          {signupEndpoint && (<>
+          <Divider orientation="vertical" flexItem />
           <Button component="a" href={signupUrl} color="secondary">
             Signup
           </Button>
+          </>)}
         </Toolbar>
       </AppBar>
     </Box>

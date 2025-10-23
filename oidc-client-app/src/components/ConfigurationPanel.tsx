@@ -16,6 +16,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import CodeIcon from '@mui/icons-material/Code';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useCallback, useEffect, useState } from "react";
 import { useOidcConfig } from "../contexts/OidcConfigContext";
 
@@ -52,6 +54,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
   const [loadMenuAnchor, setLoadMenuAnchor] = useState<null | HTMLElement>(null);
   const [viewMode, setViewMode] = useState<'form' | 'json'>('form');
   const [jsonValue, setJsonValue] = useState<string>("");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const darkTextFieldSx = {
     width: "340px",
@@ -144,38 +147,94 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
   }, [deleteConfig]);
 
   return (
-    <Box
-      sx={{
-        position: "fixed",
-        top: 64,
-        right: 0,
-        p: 2,
-        maxHeight: "calc(100vh - 64px)",
-        overflowY: "auto",
-        overflowX: "hidden",
-        zIndex: 1,
-        bgcolor: "#1a1a1a",
-        borderLeft: "1px solid",
-        borderColor: "#333",
-        boxShadow: 2,
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        "&::-webkit-scrollbar": {
-          width: "8px",
-        },
-        "&::-webkit-scrollbar-track": {
-          bgcolor: "#0a0a0a",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          bgcolor: "#555",
-          borderRadius: "4px",
-          "&:hover": {
-            bgcolor: "#777",
-          },
-        },
-      }}
-    >
+    <>
+      {/* Toggle button when panel is closed */}
+      {!isOpen && (
+        <IconButton
+          onClick={() => setIsOpen(true)}
+          sx={{
+            position: "fixed",
+            top: "50%",
+            right: 16,
+            transform: "translateY(-50%)",
+            zIndex: 1000,
+            bgcolor: "#4a9eff",
+            color: "#fff",
+            width: 48,
+            height: 48,
+            "&:hover": {
+              bgcolor: "#3a7ecc",
+            },
+            boxShadow: 4,
+            border: "2px solid #fff",
+          }}
+        >
+          <SettingsIcon />
+        </IconButton>
+      )}
+
+      {/* Configuration Panel */}
+      {isOpen && (
+        <>
+          {/* Close handle bar - positioned independently */}
+          <Box
+            onClick={() => setIsOpen(false)}
+            sx={{
+              position: "fixed",
+              left: "calc(100vw - 400px)",
+              top: "50vh",
+              transform: "translateY(-50%)",
+              width: 24,
+              height: 80,
+              bgcolor: "#4a9eff",
+              borderRadius: "8px 0 0 8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              "&:hover": {
+                bgcolor: "#3a7ecc",
+              },
+              boxShadow: 4,
+              zIndex: 1002,
+            }}
+          >
+            <ChevronRightIcon sx={{ color: "#fff" }} />
+          </Box>
+
+          <Box
+            sx={{
+              position: "fixed",
+              top: 64,
+              right: 0,
+              p: 2,
+              maxHeight: "calc(100vh - 64px)",
+              overflowY: "auto",
+              overflowX: "hidden",
+              zIndex: 1,
+              bgcolor: "#1a1a1a",
+              borderLeft: "1px solid",
+              borderColor: "#333",
+              boxShadow: 2,
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              "&::-webkit-scrollbar": {
+                width: "8px",
+              },
+              "&::-webkit-scrollbar-track": {
+                bgcolor: "#0a0a0a",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                bgcolor: "#555",
+                borderRadius: "4px",
+                "&:hover": {
+                  bgcolor: "#777",
+                },
+              },
+            }}
+          >
+
         <Box sx={{ mb: 1 }}>
           <Typography variant="h6" sx={{ color: "#ffffff", fontWeight: 600, mb: 0.5 }}>
             Configurations
@@ -414,7 +473,10 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
             }}
           />
         )}
-    </Box>
+          </Box>
+        </>
+      )}
+    </>
   );
 };
 

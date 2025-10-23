@@ -29,6 +29,15 @@ export const Layout = () => {
     }
   }, [auth]);
 
+  const onForceLogout = useCallback(async () => {
+    if (auth) {
+      // Remove all OIDC session data from storage
+      await auth.removeUser();
+      // Trigger login prompt after clearing session with prompt=login
+      auth.signinRedirect({ prompt: "login" });
+    }
+  }, [auth]);
+
   const signupUrl = useMemo(() => {
     return `${signupEndpoint}?client_id=${clientId}&redirect_uri=${postSignupRedirectUri}`;
   }, [signupEndpoint, clientId, postSignupRedirectUri]);
@@ -79,7 +88,9 @@ export const Layout = () => {
         isAuthenticated={auth.isAuthenticated}
         onClickLogin={() => auth.signinRedirect()}
         onClickLogout={onClickLogout}
+        onForceLogout={onForceLogout}
         signupUrl={signupUrl}
+        signupEndpoint={signupEndpoint}
       />
       <Container sx={{ py: 4 }}>
         <Outlet />
