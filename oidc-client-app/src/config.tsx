@@ -33,10 +33,45 @@ export const oidcConfig: AuthProviderProps = {
 };
 
 export const appConfig = {
+  authority,
   appName,
   clientId,
+  redirectUri,
   signupEndpoint,
   postSignupRedirectUri: postSignupRedirectUri,
   resourceServerUri,
   audience,
 }
+
+// Parse multiple configurations from environment variable
+export interface EnvConfig {
+  name: string;
+  authority: string;
+  clientId: string;
+  redirectUri: string;
+  signupEndpoint: string;
+  postSignupRedirectUri: string;
+  audience: string;
+  teamId: string;
+}
+
+const parseEnvConfigs = (): EnvConfig[] => {
+  const configsJson = import.meta.env.VITE_OIDC_CONFIGS;
+  if (!configsJson) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(configsJson);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+    console.warn('VITE_OIDC_CONFIGS is not an array');
+    return [];
+  } catch (error) {
+    console.error('Failed to parse VITE_OIDC_CONFIGS:', error);
+    return [];
+  }
+};
+
+export const envConfigs = parseEnvConfigs();

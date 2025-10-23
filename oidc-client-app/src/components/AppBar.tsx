@@ -1,16 +1,15 @@
 import { AppBar, AppBarProps, Button, Toolbar, Divider } from '@mui/material';
 import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { appConfig } from '../config.tsx';
 
 export interface CustomAppBarProps extends AppBarProps {
   isAuthenticated: boolean;
   onClickLogin: React.MouseEventHandler<HTMLButtonElement>;
   onClickLogout: React.MouseEventHandler<HTMLButtonElement>;
-  onClickSignup: React.MouseEventHandler<HTMLButtonElement>;
+  signupUrl: string;
 }
 
-export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, onClickSignup, ...appBarProps }: CustomAppBarProps) => {
+export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, signupUrl, ...appBarProps }: CustomAppBarProps) => {
 
   return (
     <Box sx={{ flexGrow: 1 }} {...appBarProps}>
@@ -41,11 +40,9 @@ export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, onC
             <Button onClick={onClickLogout} color="secondary">Logout</Button>
           </>}
           <Divider orientation="vertical" flexItem />
-          {appConfig.signupEndpoint && (<>
-            <Button onClick={onClickSignup} color="secondary">
-              Signup
-            </Button>
-          </>)}
+          <Button component="a" href={signupUrl} color="secondary">
+            Signup
+          </Button>
         </Toolbar>
       </AppBar>
     </Box>

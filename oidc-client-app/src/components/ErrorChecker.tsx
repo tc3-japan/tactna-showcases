@@ -19,10 +19,10 @@ const ErrorChecker = ({ children }: ErrorCheckerProps) => {
   }, [params, location.search, navigate]);
 
   useEffect(() => {
-    if (auth.error) {
+    if (auth && auth.error) {
       navigate("/error");
     }
-  }, [auth.error, navigate]);
+  }, [auth, navigate]);
 
   return <>{children ? children : <Outlet />}</>;
 };

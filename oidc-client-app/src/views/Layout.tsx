@@ -1,43 +1,49 @@
 import {
   Box,
   Container,
-  Stack,
-  TextField,
   Typography,
 } from "@mui/material";
-import { Outlet, useSearchParams } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import AppBar from "../components/AppBar";
 import Copyright from "../components/Copyright";
 import LoadingModal from "../components/LoadingModal";
 import { useAuth } from "react-oidc-context";
-import { useCallback, useEffect, useState } from "react";
-import { appConfig } from "../config";
+import { useCallback, useEffect, useMemo } from "react";
+import { useOidcConfig } from "../contexts/OidcConfigContext";
 
 export const Layout = () => {
   const auth = useAuth();
-  const [audience, setAudience] = useState<string>(appConfig.audience);
-  const [searchParams] = useSearchParams();
-  const [teamId, setTeamId] = useState<string>(searchParams.get("team_id") || "");
-  const [redirectUrlOnLogin, setRedirectUrlOnLogin] = useState<string>("");
+  const { clientId, signupEndpoint, postSignupRedirectUri, updateConfig } = useOidcConfig();
+
   useEffect(() => {
-    const teamId = auth?.user?.profile?.["https://tactna.net/team_id"] as string
-    if (teamId) {
-      setTeamId(teamId);
+    if (!auth) return;
+    const teamIdFromProfile = auth?.user?.profile?.["https://tactna.net/team_id"] as string;
+    if (teamIdFromProfile) {
+      updateConfig({ teamId: teamIdFromProfile });
     }
-  }, [auth])
-  const onClickLogin = useCallback(() => {
-    auth.signinRedirect({
-      extraQueryParams: {
-        audience: audience,
-        team_id: teamId,
-      },
-      state: redirectUrlOnLogin,
-    });
-  }, [auth, audience, teamId, redirectUrlOnLogin]);
+  }, [auth, updateConfig]);
 
+  const onClickLogout = useCallback(() => {
+    if (auth) {
+      auth.signoutRedirect({ redirectTarget: "self" });
+    }
+  }, [auth]);
 
+  const signupUrl = useMemo(() => {
+    return `${signupEndpoint}?client_id=${clientId}&redirect_uri=${postSignupRedirectUri}`;
+  }, [signupEndpoint, clientId, postSignupRedirectUri]);
 
-  // const authDisplay = () => {
+  // Safety check: if auth is not available yet, show loading
+  if (!auth) {
+    return (
+      <LoadingModal open={true}>
+        <Typography margin={3} color={"white"}>
+          Initializing...
+        </Typography>
+      </LoadingModal>
+    );
+  }
+
   switch (auth.activeNavigator) {
     case "signinSilent":
       return (
@@ -71,42 +77,10 @@ export const Layout = () => {
     <Box sx={{ minHeight: "100vh", bgcolor: "colors.lightGray" }}>
       <AppBar
         isAuthenticated={auth.isAuthenticated}
-        onClickLogin={onClickLogin}
-        onClickLogout={() => auth.signoutRedirect({ redirectTarget: "self" })}
-        onClickSignup={() => {
-          window.location.href = `${appConfig.signupEndpoint}?client_id=${appConfig.clientId}&redirect_uri=${appConfig.postSignupRedirectUri}`
-        }}
+        onClickLogin={() => auth.signinRedirect()}
+        onClickLogout={onClickLogout}
+        signupUrl={signupUrl}
       />
-      {
-        <Stack alignItems="flex-end" sx={{ p: 2 }}>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Authentication Parameters
-          </Typography>
-          <TextField
-            label="Audience"
-            value={audience}
-            onChange={(e) => setAudience(e.target.value)}
-            placeholder="https://showcase.tactna.gigops-dev.net"
-            sx={{ width: "340px" }}
-          />
-          <TextField
-            label="Team ID"
-            value={teamId}
-            onChange={(e) => setTeamId(e.target.value)}
-            placeholder="892ef6b5-da05-4748-8ea1-cd7cdb567643"
-            sx={{ width: "340px" }}
-          />
-          <TextField
-            label="Redirect URL on Login"
-            value={redirectUrlOnLogin}
-            onChange={(e) => setRedirectUrlOnLogin(e.target.value)}
-            placeholder="https://example.com"
-            sx={{ width: "340px" }}
-          />
-          </Box>
-        </Stack>
-      }
       <Container sx={{ py: 4 }}>
         <Outlet />
       </Container>
