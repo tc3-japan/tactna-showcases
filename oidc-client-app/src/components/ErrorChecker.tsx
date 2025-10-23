@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useMemo } from "react";
 import { useAuth } from "react-oidc-context";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 
@@ -10,13 +10,13 @@ const ErrorChecker = ({ children }: ErrorCheckerProps) => {
   const auth = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const params = new URLSearchParams(location.search);
+  const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
 
   useEffect(() => {
     if (params.has("error")) {
       navigate(`/error${location.search}`);
     }
-  }, [location.search, navigate]);
+  }, [params, location.search, navigate]);
 
   useEffect(() => {
     if (auth.error) {

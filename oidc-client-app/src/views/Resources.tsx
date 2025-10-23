@@ -1,7 +1,7 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Button, Stack, TextField, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
 import { appConfig } from '../config';
 
@@ -11,7 +11,7 @@ const Resources = () => {
   const [foos, setFoos] = useState({});
   const [name, setName] = useState(query.get('name') || 'world');
 
-  const getResouces = () => {
+  const getResouces = useCallback(() => {
     const bearer = `Bearer ${auth.user?.access_token.toString()}`;
     fetch(`${appConfig.resourceServerUri}?name=${name}`, {
       method: "GET",
@@ -30,11 +30,11 @@ const Resources = () => {
     }).catch((error) => {
       console.log(error);
     });
-  };
+  }, [auth, name]);
 
   useEffect(() => {
     getResouces();
-  }, []);
+  }, [getResouces]);
 
   return (
     <Stack spacing={2}>

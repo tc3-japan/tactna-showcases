@@ -46,7 +46,6 @@ const Error = () => {
       </Typography>
       <Typography variant="body1">{errorDescription}</Typography>
       <Box mt={4}>
-        {/* <Button variant="contained" color="primary" onClick={handleGoBackToHome}> */}
         <Button variant="contained" color="primary" component={Link} to="/">
           Go back to Home
         </Button>

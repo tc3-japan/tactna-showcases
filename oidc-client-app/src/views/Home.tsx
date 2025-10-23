@@ -6,7 +6,7 @@ export const Home = () => {
     <Stack alignItems="center" spacing={2}>
       <img src="/react.svg" alt="React logo" height={80} />
       <Typography variant="h5">{appConfig.appName}</Typography>
-      <p>ver. 20241019_1500</p>
+      <p>ver. 20251023_1200</p>
     </Stack>
   );
 };
