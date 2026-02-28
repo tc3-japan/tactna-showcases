@@ -172,16 +172,23 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
 }) => {
   // Load from localStorage or use initial values
   const storedConfig = loadFromStorage();
+  const initialSavedConfigs = loadSavedConfigs();
 
-  const [authority, setAuthority] = useState(storedConfig?.authority ?? initialAuthority);
-  const [clientId, setClientId] = useState(storedConfig?.clientId ?? initialClientId);
-  const [redirectUri, setRedirectUri] = useState(storedConfig?.redirectUri ?? initialRedirectUri);
-  const [signupEndpoint, setSignupEndpoint] = useState(storedConfig?.signupEndpoint ?? initialSignupEndpoint);
-  const [postSignupRedirectUri, setPostSignupRedirectUri] = useState(storedConfig?.postSignupRedirectUri ?? initialPostSignupRedirectUri);
-  const [audience, setAudience] = useState(storedConfig?.audience ?? initialAudience);
-  const [teamId, setTeamId] = useState(storedConfig?.teamId ?? initialTeamId);
-  const [savedConfigs, setSavedConfigs] = useState<SavedConfig[]>(() => loadSavedConfigs());
-  const [currentConfigName, setCurrentConfigName] = useState<string | null>(() => loadCurrentConfigName());
+  // URL clientId parameter takes priority over localStorage
+  const urlClientId = new URLSearchParams(window.location.search).get('clientId');
+  const urlMatchedConfig = urlClientId
+    ? initialSavedConfigs.find(c => c.clientId === urlClientId)
+    : undefined;
+
+  const [authority, setAuthority] = useState(urlMatchedConfig?.authority ?? storedConfig?.authority ?? initialAuthority);
+  const [clientId, setClientId] = useState(urlMatchedConfig?.clientId ?? storedConfig?.clientId ?? initialClientId);
+  const [redirectUri, setRedirectUri] = useState(urlMatchedConfig?.redirectUri ?? storedConfig?.redirectUri ?? initialRedirectUri);
+  const [signupEndpoint, setSignupEndpoint] = useState(urlMatchedConfig?.signupEndpoint ?? storedConfig?.signupEndpoint ?? initialSignupEndpoint);
+  const [postSignupRedirectUri, setPostSignupRedirectUri] = useState(urlMatchedConfig?.postSignupRedirectUri ?? storedConfig?.postSignupRedirectUri ?? initialPostSignupRedirectUri);
+  const [audience, setAudience] = useState(urlMatchedConfig?.audience ?? storedConfig?.audience ?? initialAudience);
+  const [teamId, setTeamId] = useState(urlMatchedConfig?.teamId ?? storedConfig?.teamId ?? initialTeamId);
+  const [savedConfigs, setSavedConfigs] = useState<SavedConfig[]>(initialSavedConfigs);
+  const [currentConfigName, setCurrentConfigName] = useState<string | null>(urlMatchedConfig?.name ?? loadCurrentConfigName());
 
   // Save to localStorage whenever config values change
   useEffect(() => {
@@ -201,22 +208,6 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
     saveCurrentConfigName(currentConfigName);
   }, [currentConfigName]);
 
-  // Load the last selected config on initial mount
-  useEffect(() => {
-    const lastConfigName = loadCurrentConfigName();
-    if (lastConfigName) {
-      const config = savedConfigs.find(c => c.name === lastConfigName);
-      if (config) {
-        setAuthority(config.authority);
-        setClientId(config.clientId);
-        setRedirectUri(config.redirectUri);
-        setSignupEndpoint(config.signupEndpoint);
-        setPostSignupRedirectUri(config.postSignupRedirectUri);
-        setAudience(config.audience);
-        setTeamId(config.teamId);
-      }
-    }
-  }, []); // Run only once on mount
 
   // Create default configuration on initial load if it doesn't exist
   useEffect(() => {
