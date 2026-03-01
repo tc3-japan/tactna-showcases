@@ -139,6 +139,12 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
     loadConfig(name);
     setConfigName(name); // Set the config name in the text field
     setLoadMenuAnchor(null);
+    // Remove clientId query parameter from URL
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('clientId')) {
+      url.searchParams.delete('clientId');
+      window.history.replaceState({}, '', url.pathname + url.search);
+    }
   }, [loadConfig]);
 
   const handleDeleteConfig = useCallback((name: string, event: React.MouseEvent) => {
