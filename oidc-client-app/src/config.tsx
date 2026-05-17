@@ -23,7 +23,7 @@ export const oidcConfig: AuthProviderProps = {
   scope: 'openid email',
   extraQueryParams: {
     audience,
-    ...(hideTeamId ? {} : { team_id: currUrl.searchParams.get("team_id") || "" }),
+    ...(hideTeamId && { team_id: currUrl.searchParams.get("team_id") || "" }),
   },
   onSigninCallback: (user: User | void): void => {
     const redirectUri = user?.state as string | undefined
