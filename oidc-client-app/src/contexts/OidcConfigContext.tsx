@@ -170,6 +170,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
   initialAudience = appConfig.audience,
   initialTeamId = '',
 }) => {
+  const hideTeamId = import.meta.env.VITE_HIDE_TEAM_ID === "true";
   // Load from localStorage or use initial values
   const storedConfig = loadFromStorage();
   const initialSavedConfigs = loadSavedConfigs();
@@ -305,7 +306,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
     }
 
     // Only add team_id if it's not blank
-    if (teamId && teamId.trim().length > 0) {
+    if (!hideTeamId && teamId && teamId.trim().length > 0) {
       extraQueryParams.team_id = teamId;
     }
 
