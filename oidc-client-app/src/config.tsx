@@ -11,6 +11,7 @@ const signupEndpoint = import.meta.env.VITE_SIGNUP_ENDPOINT;
 const postSignupRedirectUri = import.meta.env.VITE_REDIRECT_SIGN_UP || window.location.origin;
 const resourceServerUri = assert(import.meta.env.VITE_RESOURCE_SERVER_URI);
 const audience = import.meta.env.VITE_AUDIENCE;
+const hideTeamId = import.meta.env.VITE_HIDE_TEAM_ID === "true";
 
 const currUrl = new URL(window.location.href);
 
@@ -22,7 +23,7 @@ export const oidcConfig: AuthProviderProps = {
   scope: 'openid email',
   extraQueryParams: {
     audience,
-    team_id: currUrl.searchParams.get("team_id") || "",
+    ...(hideTeamId ? {} : { team_id: currUrl.searchParams.get("team_id") || "" }),
   },
   onSigninCallback: (user: User | void): void => {
     const redirectUri = user?.state as string | undefined

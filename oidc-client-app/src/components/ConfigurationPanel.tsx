@@ -26,6 +26,8 @@ interface ConfigurationPanelProps {
 }
 
 export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfigChange }) => {
+  const hideTeamId = import.meta.env.VITE_HIDE_TEAM_ID === "true";
+
   const {
     authority,
     clientId,
@@ -449,13 +451,15 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
               placeholder="https://showcase.tactna.gigops-dev.net"
               sx={darkTextFieldSx}
             />
-            <TextField
-              label="Team ID"
-              value={localTeamId}
-              onChange={(e) => setLocalTeamId(e.target.value)}
-              placeholder="892ef6b5-da05-4748-8ea1-cd7cdb567643"
-              sx={darkTextFieldSx}
-            />
+            {hideTeamId ? null : (
+              <TextField
+                label="Team ID"
+                value={localTeamId}
+                onChange={(e) => setLocalTeamId(e.target.value)}
+                placeholder="892ef6b5-da05-4748-8ea1-cd7cdb567643"
+                sx={darkTextFieldSx}
+              />
+            )}
           </>
         ) : (
           <TextField
