@@ -9,7 +9,10 @@ const currUrl = new URL(window.location.href);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <OidcConfigProvider initialTeamId={currUrl.searchParams.get("team_id") || ""}>
+    <OidcConfigProvider
+      initialTeamId={currUrl.searchParams.get("team_id") || ""}
+      initialFederationId={currUrl.searchParams.get("identity_provider") || ""}
+    >
       <ConfigurationPanel />
       <DynamicAuthProvider>
         <App />

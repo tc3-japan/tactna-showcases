@@ -13,6 +13,7 @@ interface SavedConfig {
   postSignupRedirectUri: string;
   audience: string;
   teamId: string;
+  federationId: string;
   isFromEnv?: boolean; // Flag to indicate if config is from environment variables
 }
 
@@ -25,6 +26,7 @@ interface OidcConfigContextType {
   postSignupRedirectUri: string;
   audience: string;
   teamId: string;
+  federationId: string;
   updateConfig: (updates: {
     authority?: string;
     clientId?: string;
@@ -33,6 +35,7 @@ interface OidcConfigContextType {
     postSignupRedirectUri?: string;
     audience?: string;
     teamId?: string;
+    federationId?: string;
   }) => void;
   savedConfigs: SavedConfig[];
   currentConfigName: string | null;
@@ -55,6 +58,7 @@ interface StoredConfig {
   postSignupRedirectUri: string;
   audience: string;
   teamId: string;
+  federationId: string;
 }
 
 const loadFromStorage = (): Partial<StoredConfig> | null => {
@@ -90,6 +94,7 @@ const loadSavedConfigs = (): SavedConfig[] => {
       postSignupRedirectUri: config.postSignupRedirectUri,
       audience: config.audience,
       teamId: config.teamId,
+      federationId: config.federationId ?? '', // Optional: omitted in existing VITE_OIDC_CONFIGS
       isFromEnv: true, // Mark as environment config
     }));
 
@@ -158,6 +163,7 @@ interface OidcConfigProviderProps {
   initialPostSignupRedirectUri?: string;
   initialAudience?: string;
   initialTeamId?: string;
+  initialFederationId?: string;
 }
 
 export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
@@ -169,6 +175,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
   initialPostSignupRedirectUri = appConfig.postSignupRedirectUri,
   initialAudience = appConfig.audience,
   initialTeamId = '',
+  initialFederationId = '',
 }) => {
   // Load from localStorage or use initial values
   const storedConfig = loadFromStorage();
@@ -180,6 +187,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
   const [postSignupRedirectUri, setPostSignupRedirectUri] = useState(storedConfig?.postSignupRedirectUri ?? initialPostSignupRedirectUri);
   const [audience, setAudience] = useState(storedConfig?.audience ?? initialAudience);
   const [teamId, setTeamId] = useState(storedConfig?.teamId ?? initialTeamId);
+  const [federationId, setFederationId] = useState(storedConfig?.federationId ?? initialFederationId);
   const [savedConfigs, setSavedConfigs] = useState<SavedConfig[]>(() => loadSavedConfigs());
   const [currentConfigName, setCurrentConfigName] = useState<string | null>(() => loadCurrentConfigName());
 
@@ -193,8 +201,9 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
       postSignupRedirectUri,
       audience,
       teamId,
+      federationId,
     });
-  }, [authority, clientId, redirectUri, signupEndpoint, postSignupRedirectUri, audience, teamId]);
+  }, [authority, clientId, redirectUri, signupEndpoint, postSignupRedirectUri, audience, teamId, federationId]);
 
   // Save current config name to localStorage whenever it changes
   useEffect(() => {
@@ -214,6 +223,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
         setPostSignupRedirectUri(config.postSignupRedirectUri);
         setAudience(config.audience);
         setTeamId(config.teamId);
+        setFederationId(config.federationId ?? '');
       }
     }
   }, []); // Run only once on mount
@@ -231,6 +241,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
         postSignupRedirectUri: initialPostSignupRedirectUri,
         audience: initialAudience,
         teamId: initialTeamId,
+        federationId: initialFederationId,
       };
       const updatedConfigs = [...savedConfigs, defaultConfig];
       setSavedConfigs(updatedConfigs);
@@ -246,6 +257,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
     postSignupRedirectUri?: string;
     audience?: string;
     teamId?: string;
+    federationId?: string;
   }) => {
     if (updates.authority !== undefined) setAuthority(updates.authority);
     if (updates.clientId !== undefined) setClientId(updates.clientId);
@@ -254,6 +266,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
     if (updates.postSignupRedirectUri !== undefined) setPostSignupRedirectUri(updates.postSignupRedirectUri);
     if (updates.audience !== undefined) setAudience(updates.audience);
     if (updates.teamId !== undefined) setTeamId(updates.teamId);
+    if (updates.federationId !== undefined) setFederationId(updates.federationId);
   }, []);
 
   const saveCurrentConfig = useCallback((name: string) => {
@@ -266,13 +279,14 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
       postSignupRedirectUri,
       audience,
       teamId,
+      federationId,
     };
 
     const updatedConfigs = [...savedConfigs.filter(c => c.name !== name), newConfig];
     setSavedConfigs(updatedConfigs);
     saveSavedConfigs(updatedConfigs);
     setCurrentConfigName(name);
-  }, [authority, clientId, redirectUri, signupEndpoint, postSignupRedirectUri, audience, teamId, savedConfigs]);
+  }, [authority, clientId, redirectUri, signupEndpoint, postSignupRedirectUri, audience, teamId, federationId, savedConfigs]);
 
   const loadConfig = useCallback((name: string) => {
     const config = savedConfigs.find(c => c.name === name);
@@ -284,6 +298,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
       setPostSignupRedirectUri(config.postSignupRedirectUri);
       setAudience(config.audience);
       setTeamId(config.teamId);
+      setFederationId(config.federationId ?? '');
       setCurrentConfigName(name);
     }
   }, [savedConfigs]);
@@ -318,6 +333,12 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
       extraQueryParams.team_id = teamId;
     }
 
+    // Only add identity_provider if it's not blank.
+    // Skips the IdP chooser and goes straight to this external IdP.
+    if (federationId && federationId.trim().length > 0) {
+      extraQueryParams.identity_provider = federationId.trim();
+    }
+
     return {
       authority,
       client_id: clientId,
@@ -332,7 +353,7 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
         }
       },
     };
-  }, [authority, clientId, redirectUri, audience, teamId]);
+  }, [authority, clientId, redirectUri, audience, teamId, federationId]);
 
   const contextValue = useMemo(() => ({
     config,
@@ -343,13 +364,14 @@ export const OidcConfigProvider: React.FC<OidcConfigProviderProps> = ({
     postSignupRedirectUri,
     audience,
     teamId,
+    federationId,
     updateConfig,
     savedConfigs,
     currentConfigName,
     saveCurrentConfig,
     loadConfig,
     deleteConfig,
-  }), [config, authority, clientId, redirectUri, signupEndpoint, postSignupRedirectUri, audience, teamId, updateConfig, savedConfigs, currentConfigName, saveCurrentConfig, loadConfig, deleteConfig]);
+  }), [config, authority, clientId, redirectUri, signupEndpoint, postSignupRedirectUri, audience, teamId, federationId, updateConfig, savedConfigs, currentConfigName, saveCurrentConfig, loadConfig, deleteConfig]);
 
   return (
     <OidcConfigContext.Provider value={contextValue}>
