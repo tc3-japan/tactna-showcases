@@ -26,6 +26,8 @@ interface ConfigurationPanelProps {
 }
 
 export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfigChange }) => {
+  const hideTeamId = import.meta.env.VITE_HIDE_TEAM_ID === "true";
+
   const {
     authority,
     clientId,
@@ -144,6 +146,12 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
     loadConfig(name);
     setConfigName(name); // Set the config name in the text field
     setLoadMenuAnchor(null);
+    // Remove clientId query parameter from URL
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('clientId')) {
+      url.searchParams.delete('clientId');
+      window.history.replaceState({}, '', url.pathname + url.search);
+    }
   }, [loadConfig]);
 
   const handleDeleteConfig = useCallback((name: string, event: React.MouseEvent) => {
@@ -448,13 +456,15 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
               placeholder="https://showcase.tactna.gigops-dev.net"
               sx={darkTextFieldSx}
             />
-            <TextField
-              label="Team ID"
-              value={localTeamId}
-              onChange={(e) => setLocalTeamId(e.target.value)}
-              placeholder="892ef6b5-da05-4748-8ea1-cd7cdb567643"
-              sx={darkTextFieldSx}
-            />
+            {hideTeamId ? null : (
+              <TextField
+                label="Team ID"
+                value={localTeamId}
+                onChange={(e) => setLocalTeamId(e.target.value)}
+                placeholder="892ef6b5-da05-4748-8ea1-cd7cdb567643"
+                sx={darkTextFieldSx}
+              />
+            )}
             <TextField
               label="Federation ID (External IdP)"
               value={localFederationId}

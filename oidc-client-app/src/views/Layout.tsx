@@ -12,8 +12,10 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useOidcConfig } from "../contexts/OidcConfigContext";
 
 export const Layout = () => {
+  const useV2LogoutForForceLogout = import.meta.env.VITE_USE_V2_LOGOUT_FOR_FORCE_LOGOUT === "true";
+
   const auth = useAuth();
-  const { clientId, signupEndpoint, postSignupRedirectUri, updateConfig } = useOidcConfig();
+  const { authority, clientId, signupEndpoint, postSignupRedirectUri, updateConfig } = useOidcConfig();
 
   useEffect(() => {
     if (!auth) return;
@@ -33,10 +35,19 @@ export const Layout = () => {
     if (auth) {
       // Remove all OIDC session data from storage
       await auth.removeUser();
-      // Trigger login prompt after clearing session with prompt=login
-      auth.signinRedirect({ prompt: "login" });
+      if (useV2LogoutForForceLogout) {
+        // Use Auth0 v2 logout endpoint
+        const logoutUrl = new URL("/v2/logout", authority);
+        logoutUrl.searchParams.append("client_id", clientId);
+        logoutUrl.searchParams.append("returnTo", window.location.origin);
+        window.location.href = logoutUrl.toString();
+        return;
+      } else {
+        // Trigger login prompt after clearing session with prompt=login
+        auth.signinRedirect({ prompt: "login" });
+      }
     }
-  }, [auth]);
+  }, [auth, useV2LogoutForForceLogout, authority, clientId]);
 
   const signupUrl = useMemo(() => {
     const url = new URL(signupEndpoint);
