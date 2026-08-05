@@ -36,6 +36,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
     postSignupRedirectUri,
     audience,
     teamId,
+    federationId,
     updateConfig,
     savedConfigs,
     currentConfigName,
@@ -51,6 +52,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
   const [localPostSignupRedirectUri, setLocalPostSignupRedirectUri] = useState<string>(postSignupRedirectUri);
   const [localAudience, setLocalAudience] = useState<string>(audience);
   const [localTeamId, setLocalTeamId] = useState<string>(teamId);
+  const [localFederationId, setLocalFederationId] = useState<string>(federationId);
 
   const [configName, setConfigName] = useState<string>("");
   const [loadMenuAnchor, setLoadMenuAnchor] = useState<null | HTMLElement>(null);
@@ -90,10 +92,11 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
         postSignupRedirectUri: localPostSignupRedirectUri,
         audience: localAudience,
         teamId: localTeamId,
+        federationId: localFederationId,
       };
       setJsonValue(JSON.stringify(configObj, null, 2));
     }
-  }, [viewMode, configName, localAuthority, localClientId, localRedirectUri, localSignupEndpoint, localPostSignupRedirectUri, localAudience, localTeamId]);
+  }, [viewMode, configName, localAuthority, localClientId, localRedirectUri, localSignupEndpoint, localPostSignupRedirectUri, localAudience, localTeamId, localFederationId]);
 
   // Update context when local values change (debounced to reduce re-renders)
   useEffect(() => {
@@ -106,12 +109,13 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
         postSignupRedirectUri: localPostSignupRedirectUri,
         audience: localAudience,
         teamId: localTeamId,
+        federationId: localFederationId,
       });
       onConfigChange?.();
     }, 500); // 500ms debounce delay
 
     return () => clearTimeout(timeoutId);
-  }, [localAuthority, localClientId, localRedirectUri, localSignupEndpoint, localPostSignupRedirectUri, localAudience, localTeamId, updateConfig, onConfigChange]);
+  }, [localAuthority, localClientId, localRedirectUri, localSignupEndpoint, localPostSignupRedirectUri, localAudience, localTeamId, localFederationId, updateConfig, onConfigChange]);
 
   const handleJsonChange = useCallback((newJson: string) => {
     setJsonValue(newJson);
@@ -125,6 +129,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
       if (parsed.postSignupRedirectUri !== undefined) setLocalPostSignupRedirectUri(parsed.postSignupRedirectUri);
       if (parsed.audience !== undefined) setLocalAudience(parsed.audience);
       if (parsed.teamId !== undefined) setLocalTeamId(parsed.teamId);
+      if (parsed.federationId !== undefined) setLocalFederationId(parsed.federationId);
     } catch (e) {
       // Invalid JSON, just update the text value
     }
@@ -460,6 +465,13 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
                 sx={darkTextFieldSx}
               />
             )}
+            <TextField
+              label="Federation ID (External IdP)"
+              value={localFederationId}
+              onChange={(e) => setLocalFederationId(e.target.value)}
+              placeholder="5fa2c0b6c4694acdb94eb273b3e3c075"
+              sx={darkTextFieldSx}
+            />
           </>
         ) : (
           <TextField

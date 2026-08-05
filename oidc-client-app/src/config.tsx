@@ -24,6 +24,7 @@ export const oidcConfig: AuthProviderProps = {
   extraQueryParams: {
     audience,
     ...(hideTeamId && { team_id: currUrl.searchParams.get("team_id") || "" }),
+    identity_provider: currUrl.searchParams.get("identity_provider") || "",
   },
   onSigninCallback: (user: User | void): void => {
     const redirectUri = user?.state as string | undefined
@@ -54,6 +55,7 @@ export interface EnvConfig {
   postSignupRedirectUri: string;
   audience: string;
   teamId: string;
+  federationId?: string;
 }
 
 const parseEnvConfigs = (): EnvConfig[] => {

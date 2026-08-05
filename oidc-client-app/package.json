@@ -6,7 +6,7 @@
   "scripts": {
     "heroku-postbuild": "npm run build",
     "start": "serve -s build",
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc && vite build",
     "build:debug": "tsc && vite build --sourcemap",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",

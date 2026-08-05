@@ -8,11 +8,11 @@ interface DynamicAuthProviderProps {
 }
 
 export const DynamicAuthProvider: React.FC<DynamicAuthProviderProps> = ({ children }) => {
-  const { config, authority, clientId, redirectUri, audience, teamId } = useOidcConfig();
+  const { config, authority, clientId, redirectUri, audience, teamId, federationId } = useOidcConfig();
   const [key, setKey] = useState(0);
   const isAuthFlowInProgress = useRef(false);
   const [isInitialized, setIsInitialized] = useState(false);
-  const previousConfigRef = useRef({ authority, clientId, redirectUri, audience, teamId });
+  const previousConfigRef = useRef({ authority, clientId, redirectUri, audience, teamId, federationId });
 
   // Check if we're in the middle of an OAuth callback
   useEffect(() => {
@@ -49,13 +49,14 @@ export const DynamicAuthProvider: React.FC<DynamicAuthProviderProps> = ({ childr
       previousConfigRef.current.clientId !== clientId ||
       previousConfigRef.current.redirectUri !== redirectUri ||
       previousConfigRef.current.audience !== audience ||
-      previousConfigRef.current.teamId !== teamId;
+      previousConfigRef.current.teamId !== teamId ||
+      previousConfigRef.current.federationId !== federationId;
 
     if (configChanged && !isAuthFlowInProgress.current) {
-      previousConfigRef.current = { authority, clientId, redirectUri, audience, teamId };
+      previousConfigRef.current = { authority, clientId, redirectUri, audience, teamId, federationId };
       setKey(prev => prev + 1);
     }
-  }, [authority, clientId, redirectUri, audience, teamId, isInitialized]);
+  }, [authority, clientId, redirectUri, audience, teamId, federationId, isInitialized]);
 
   // Don't render children until config is available
   // This ensures AuthProvider is always mounted when children try to use useAuth()
