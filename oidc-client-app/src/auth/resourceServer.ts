@@ -1,4 +1,5 @@
 import { AuthContextProps } from 'react-oidc-context';
+import { decodeToken } from 'react-jwt';
 
 export interface ApiFailure {
   message: string;
@@ -42,26 +43,36 @@ export const callResourceServer = async <T>(
     return body ? ` — ${body.slice(0, 200)}` : '';
   };
 
+  /** What the token is actually valid for, which is what a 401 is usually about. */
+  const audienceOf = (accessToken?: string): string => {
+    const aud = (decodeToken(accessToken ?? '') as { aud?: string | string[] } | null)?.aud;
+    const list = Array.isArray(aud) ? aud : aud ? [aud] : [];
+    return list.length ? list.join(', ') : 'none';
+  };
+
   try {
-    let response = await send(auth.user?.access_token);
+    // Kept so the message can report the audience of the token that was
+    // actually refused, not the one the context happens to hold by then.
+    let sentToken = auth.user?.access_token;
+    let response = await send(sentToken);
 
     if (response.status === 401) {
       const renewed = await auth.signinSilent().catch(() => null);
       if (!renewed) {
         return fail('The session has ended. Log in again to continue.');
       }
-      response = await send(renewed.access_token);
+      sentToken = renewed.access_token;
+      response = await send(sentToken);
     }
 
-    // A refused *fresh* token is not about the token's age. The usual cause is
-    // that it was not minted for this API: the authorization request's
-    // `audience` has to cover it, and the API verifies exactly that. The other
-    // causes are the account losing access and the permission the endpoint
-    // requires. The app cannot tell them apart, so it does not claim to.
+    // A refused *fresh* token is not about the token's age, and the app cannot
+    // tell the remaining causes apart (which audience this API wants, whether
+    // the account still has access, whether the endpoint exists here). Report
+    // what it can see -- the token's audience and the API's own answer -- and
+    // let the reader decide.
     if (response.status === 401) {
       return fail(
-        `The API refused this token (401). Check that the access token's audience covers this API,` +
-          ` and that this account still has access to it.${await detail(response)}`,
+        `The API refused this token (401). Token audience: ${audienceOf(sentToken)}.${await detail(response)}`,
       );
     }
     if (response.status === 403) {

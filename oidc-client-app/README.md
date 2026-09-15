@@ -105,10 +105,11 @@ The call needs a user token whose `audience` covers the Tactna API
 rejected. `audience` takes a comma-separated list when the app calls its own
 resource server as well.
 
-A 401 here is almost always that audience: the API verifies the token against
-the audience it expects, so a token minted for another resource server is
-refused however fresh it is. Compare `aud` on the Profile screen with the API
-you are calling before looking anywhere else.
+Which endpoint you call decides whether the audience matters. Tactna's own API
+(`https://api.<tenant-domain>`) does not check it; the custom-module endpoints
+(`https://capi.<tenant-domain>`) go through an authorizer that does. A 401 from
+the latter with a token minted for another resource server is that check. The
+error message reports the token's audience so you can tell the two apart.
 
 Note the trap this exercises: `signinRedirect(args)` **replaces** the provider's
 `extraQueryParams` instead of merging, so a one-off request must rebuild them all
