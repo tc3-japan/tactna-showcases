@@ -56,26 +56,22 @@ export const Layout = () => {
     [signupEndpoint, clientId, postSignupRedirectUri],
   );
 
-  switch (auth.activeNavigator) {
-    case "signinSilent":
-      return (
-        <LoadingModal open={true}>
-          <Typography margin={3} color={"white"}>
-            Signing you in...
-          </Typography>
-        </LoadingModal>
-      );
-    case "signoutRedirect":
-      return (
-        <LoadingModal open={true}>
-          <Typography margin={3} color={"white"}>
-            Signing you out...
-          </Typography>
-        </LoadingModal>
-      );
+  if (auth.activeNavigator === "signoutRedirect") {
+    return (
+      <LoadingModal open={true}>
+        <Typography margin={3} color={"white"}>
+          Signing you out...
+        </Typography>
+      </LoadingModal>
+    );
   }
 
-  if (auth.isLoading) {
+  // Deliberately NOT for `signinSilent`: a renewal is meant to be invisible, and
+  // replacing the app with a loading screen unmounts the whole tree, so every
+  // mount effect runs again when the renewal finishes. A screen that loads data
+  // on mount then reloads on every renewal — and since a 401 triggers a
+  // renewal, an API that keeps refusing turns that into an unbounded loop.
+  if (auth.isLoading && !auth.activeNavigator) {
     return (
       <LoadingModal open={true}>
         <Typography margin={3} color={"white"}>
