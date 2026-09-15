@@ -36,6 +36,12 @@ export const callResourceServer = async <T>(
 
   const fail = (message: string, retriable = false): ApiResult<T> => ({ ok: false, error: { message, retriable } });
 
+  /** Whatever the API said, for the message. Bodies here are short or absent. */
+  const detail = async (response: Response) => {
+    const body = await response.text().catch(() => '');
+    return body ? ` — ${body.slice(0, 200)}` : '';
+  };
+
   try {
     let response = await send(auth.user?.access_token);
 
@@ -47,14 +53,22 @@ export const callResourceServer = async <T>(
       response = await send(renewed.access_token);
     }
 
+    // A refused *fresh* token is not about the token's age. The usual cause is
+    // that it was not minted for this API: the authorization request's
+    // `audience` has to cover it, and the API verifies exactly that. The other
+    // causes are the account losing access and the permission the endpoint
+    // requires. The app cannot tell them apart, so it does not claim to.
     if (response.status === 401) {
-      return fail('A fresh token was refused. This account may no longer have access to this app.');
+      return fail(
+        `The API refused this token (401). Check that the access token's audience covers this API,` +
+          ` and that this account still has access to it.${await detail(response)}`,
+      );
     }
     if (response.status === 403) {
-      return fail('This account may not perform this operation.');
+      return fail(`This account may not perform this operation (403).${await detail(response)}`);
     }
     if (!response.ok) {
-      return fail(`${response.status} ${response.statusText}`, true);
+      return fail(`${response.status} ${response.statusText}${await detail(response)}`, true);
     }
     return { ok: true, data: (await response.json()) as T };
   } catch (e) {

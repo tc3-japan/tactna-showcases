@@ -105,6 +105,11 @@ The call needs a user token whose `audience` covers the Tactna API
 rejected. `audience` takes a comma-separated list when the app calls its own
 resource server as well.
 
+A 401 here is almost always that audience: the API verifies the token against
+the audience it expects, so a token minted for another resource server is
+refused however fresh it is. Compare `aud` on the Profile screen with the API
+you are calling before looking anywhere else.
+
 Note the trap this exercises: `signinRedirect(args)` **replaces** the provider's
 `extraQueryParams` instead of merging, so a one-off request must rebuild them all
 (`extraQueryParams()` in `src/auth/settings.ts`) or it silently drops `audience`.
