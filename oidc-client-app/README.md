@@ -149,9 +149,17 @@ The same applies to API calls (`src/auth/resourceServer.ts`): a 401 is renewed
 second 401 means access changed and is reported, never re-authenticated. A 403
 is the resource server's own answer and is never a reason to log in again.
 
-The same trap exists in the calling component: renewing a token changes the
-`auth` object, so an effect that both fetches and depends on `auth` re-fetches
-every renewal. See the dependency list in `src/views/Resources.tsx`.
+The same trap exists around the calling component, in two places:
+
+- renewing a token changes the `auth` object, so an effect that both fetches and
+  depends on `auth` re-fetches every renewal (see the dependency list in
+  `src/views/Resources.tsx`);
+- **do not replace the app with a loading screen while `activeNavigator` is
+  `signinSilent`.** A renewal is meant to be invisible; unmounting the tree makes
+  every mount effect run again when it finishes, so a screen that loads on mount
+  reloads on every renewal — and since a 401 triggers a renewal, an API that
+  keeps refusing becomes an unbounded request loop (measured at ~3.6 calls per
+  second). `src/views/Layout.tsx` shows the gate.
 
 ## Calling a resource server
 
