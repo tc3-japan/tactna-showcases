@@ -1,22 +1,24 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-import ConfigurationPanel from './components/ConfigurationPanel.tsx'
-import { OidcConfigProvider } from './contexts/OidcConfigContext.tsx';
-import { DynamicAuthProvider } from './components/DynamicAuthProvider.tsx';
+import { TactnaAuthProvider } from './auth/TactnaAuthProvider.tsx'
+import { DevTools } from './devtools/DevTools.tsx'
 
-const currUrl = new URL(window.location.href);
+// The panel lets a tester point this app at another tenant/client at runtime. A
+// real integration configures itself from .env and mounts TactnaAuthProvider
+// directly — set VITE_CONFIG_PANEL=false to see that shape.
+const showConfigPanel = import.meta.env.VITE_CONFIG_PANEL !== 'false';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <OidcConfigProvider
-      initialTeamId={currUrl.searchParams.get("team_id") || ""}
-      initialFederationId={currUrl.searchParams.get("identity_provider") || ""}
-    >
-      <ConfigurationPanel />
-      <DynamicAuthProvider>
+    {showConfigPanel ? (
+      <DevTools>
         <App />
-      </DynamicAuthProvider>
-    </OidcConfigProvider>
+      </DevTools>
+    ) : (
+      <TactnaAuthProvider>
+        <App />
+      </TactnaAuthProvider>
+    )}
   </React.StrictMode>,
 )

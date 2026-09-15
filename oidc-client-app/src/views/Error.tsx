@@ -1,39 +1,26 @@
 import { Link, useLocation } from "react-router-dom";
-import { Container, Typography, Button, Box } from "@mui/material";
+import { Container, Typography, Button, Box, Stack } from "@mui/material";
 import { useAuth } from "react-oidc-context";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { readAuthError } from "../auth/errors";
 
-interface ErrorExtra {
-  error: string;
-  error_description: string;
-}
-
+/**
+ * Where every authorization failure ends up. It offers an action but never takes
+ * one: starting a login from here would loop for as long as the cause lasts.
+ */
 const Error = () => {
   const auth = useAuth();
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const isErrorExtra = (obj: any): obj is ErrorExtra => {
-    return obj && 'error' in obj;
-  };
+  const info = readAuthError(location.search, auth.error);
 
-  let errorExtra: ErrorExtra | undefined;
-  if (isErrorExtra(auth.error)) {
-    errorExtra = auth.error;
-  }
-
-  const error = params.get("error") || errorExtra?.error || auth.error?.name;
-  const errorDescription =
-    params.get("error_description") ||
-    errorExtra?.error_description ||
-    auth.error?.message ||
-    "An unknown error occurred.";
-
+  // Drop the failed session, once. `removeUser()` produces a new `auth` object
+  // while `auth.error` stays set, so an unguarded effect would call it forever.
+  const removed = useRef(false);
   useEffect(() => {
-    if (auth.error) {
-      auth.removeUser();
-    }
+    if (!auth.error || removed.current) return;
+    removed.current = true;
+    void auth.removeUser();
   }, [auth]);
 
   return (
@@ -41,14 +28,27 @@ const Error = () => {
       <Typography variant="h5" gutterBottom>
         Error occurred
       </Typography>
-      <Typography variant="h4" color="error" gutterBottom>
-        {error}
+      <Typography variant="h6" color="error" gutterBottom>
+        {info?.code ?? "unknown_error"}
       </Typography>
-      <Typography variant="body1">{errorDescription}</Typography>
+      <Typography variant="body1">{info?.summary ?? "An unknown error occurred."}</Typography>
+      {info?.description && (
+        // Shown for support, not branched on: the wording is not part of the contract.
+        <Typography variant="body2" color="text.secondary" mt={1}>
+          {info.description}
+        </Typography>
+      )}
       <Box mt={4}>
-        <Button variant="contained" color="primary" component={Link} to="/">
-          Go back to Home
-        </Button>
+        <Stack direction="row" spacing={2} justifyContent="center">
+          <Button variant="contained" color="primary" component={Link} to="/">
+            Go back to Home
+          </Button>
+          {info?.canRetryLogin && (
+            <Button variant="outlined" onClick={() => void auth.signinRedirect()}>
+              Log in again
+            </Button>
+          )}
+        </Stack>
       </Box>
     </Container>
   );

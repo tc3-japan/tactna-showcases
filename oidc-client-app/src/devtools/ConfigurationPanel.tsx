@@ -19,7 +19,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useCallback, useEffect, useState } from "react";
-import { useOidcConfig } from "../contexts/OidcConfigContext";
+import { useDevSettings } from "./DevSettingsContext";
 
 interface ConfigurationPanelProps {
   onConfigChange?: () => void;
@@ -29,21 +29,23 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
   const hideTeamId = import.meta.env.VITE_HIDE_TEAM_ID === "true";
 
   const {
-    authority,
-    clientId,
-    redirectUri,
-    signupEndpoint,
-    postSignupRedirectUri,
-    audience,
-    teamId,
-    federationId,
-    updateConfig,
+    settings: {
+      authority,
+      clientId,
+      redirectUri,
+      signupEndpoint,
+      postSignupRedirectUri,
+      audience,
+      teamId,
+      federationId,
+    },
+    updateSettings,
     savedConfigs,
     currentConfigName,
     saveCurrentConfig,
     loadConfig,
     deleteConfig
-  } = useOidcConfig();
+  } = useDevSettings();
 
   const [localAuthority, setLocalAuthority] = useState<string>(authority);
   const [localClientId, setLocalClientId] = useState<string>(clientId);
@@ -73,6 +75,20 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
     "& .MuiInputBase-input::placeholder": { color: "#888", opacity: 1 }
   };
 
+  // Take over whatever changes the settings from outside the form (Load config,
+  // or the team the tokens came back with). Without this the form keeps showing
+  // the old values and the debounce below writes them straight back.
+  useEffect(() => {
+    setLocalAuthority(authority);
+    setLocalClientId(clientId);
+    setLocalRedirectUri(redirectUri);
+    setLocalSignupEndpoint(signupEndpoint);
+    setLocalPostSignupRedirectUri(postSignupRedirectUri);
+    setLocalAudience(audience);
+    setLocalTeamId(teamId);
+    setLocalFederationId(federationId);
+  }, [authority, clientId, redirectUri, signupEndpoint, postSignupRedirectUri, audience, teamId, federationId]);
+
   // Sync configName with currentConfigName from context
   useEffect(() => {
     if (currentConfigName) {
@@ -101,7 +117,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
   // Update context when local values change (debounced to reduce re-renders)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      updateConfig({
+      updateSettings({
         authority: localAuthority,
         clientId: localClientId,
         redirectUri: localRedirectUri,
@@ -115,7 +131,7 @@ export const ConfigurationPanel: React.FC<ConfigurationPanelProps> = ({ onConfig
     }, 500); // 500ms debounce delay
 
     return () => clearTimeout(timeoutId);
-  }, [localAuthority, localClientId, localRedirectUri, localSignupEndpoint, localPostSignupRedirectUri, localAudience, localTeamId, localFederationId, updateConfig, onConfigChange]);
+  }, [localAuthority, localClientId, localRedirectUri, localSignupEndpoint, localPostSignupRedirectUri, localAudience, localTeamId, localFederationId, updateSettings, onConfigChange]);
 
   const handleJsonChange = useCallback((newJson: string) => {
     setJsonValue(newJson);
