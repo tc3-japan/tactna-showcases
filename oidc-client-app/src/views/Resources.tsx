@@ -1,40 +1,37 @@
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import { Button, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Button, Stack, TextField, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
-import { appConfig } from '../config';
+import { useSettings } from '../auth/TactnaAuthProvider';
+import { ApiFailure, callResourceServer } from '../auth/resourceServer';
 
+/** Calls a resource server with the access token Tactna issued. */
 const Resources = () => {
   const auth = useAuth();
-  const query = new URLSearchParams(window.location.search);
-  const [foos, setFoos] = useState({});
-  const [name, setName] = useState(query.get('name') || 'world');
+  const { resourceServerUri } = useSettings();
+  const [foos, setFoos] = useState<unknown>({});
+  const [error, setError] = useState<ApiFailure | null>(null);
+  const [name, setName] = useState(new URLSearchParams(window.location.search).get('name') || 'world');
 
-  const getResouces = useCallback(() => {
-    const bearer = `Bearer ${auth.user?.access_token.toString()}`;
-    fetch(`${appConfig.resourceServerUri}?name=${name}`, {
-      method: "GET",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization': bearer,
-      }
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to fetch resources');
-      }
-      response.json().then((data) => {
-        setFoos(data);
-      });
-    }).catch((error) => {
-      console.log(error);
-    });
-  }, [auth, name]);
+  const getResources = useCallback(async () => {
+    const result = await callResourceServer<unknown>(
+      auth,
+      `${resourceServerUri}?name=${encodeURIComponent(name)}`,
+    );
+    setError(result.ok ? null : result.error);
+    if (result.ok) {
+      setFoos(result.data);
+    }
+  }, [auth, name, resourceServerUri]);
 
   useEffect(() => {
-    getResouces();
-  }, [getResouces]);
+    void getResources();
+    // Deliberately not on `getResources`/`auth`: a 401 renews the token inside
+    // the call, which produces a new `auth` — refetching on that would spin
+    // against a resource server that keeps refusing.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, resourceServerUri]);
 
   return (
     <Stack spacing={2}>
@@ -42,8 +39,24 @@ const Resources = () => {
       <SyntaxHighlighter language="json" style={dracula}>
         {JSON.stringify(foos)}
       </SyntaxHighlighter>
-      <TextField value={name} label="Name" onChange={(e) => setName(e.currentTarget.value)}/>
-      <Button variant="contained" color="primary" onClick={getResouces}>
+      {error && (
+        <Alert
+          severity={error.retriable ? 'warning' : 'error'}
+          // A retry only where one can succeed: an unauthenticated or forbidden
+          // answer stands until somebody changes the account's access.
+          action={
+            error.retriable ? (
+              <Button size="small" onClick={() => void getResources()}>
+                Retry
+              </Button>
+            ) : undefined
+          }
+        >
+          {error.message}
+        </Alert>
+      )}
+      <TextField value={name} label="Name" onChange={(e) => setName(e.currentTarget.value)} />
+      <Button variant="contained" color="primary" onClick={() => void getResources()}>
         Get Resources
       </Button>
     </Stack>

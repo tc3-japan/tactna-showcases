@@ -33,6 +33,10 @@ export const CustomAppBar = ({ isAuthenticated, onClickLogin, onClickLogout, onF
           <Button component={Link} to="/profile">
             Profile
           </Button>
+          <Divider orientation="vertical" flexItem />
+          <Button component={Link} to="/teams">
+            Teams
+          </Button>
           {showLinksMenu && <>
             <Divider orientation="vertical" flexItem />
             <Button component={Link} to="/links">

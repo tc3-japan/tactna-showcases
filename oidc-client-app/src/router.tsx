@@ -8,6 +8,7 @@ import Home from './views/Home';
 import Resources from './views/Resources';
 import LoadingModal from './components/LoadingModal';
 import { Links } from './views/Links';
+import Teams from './views/Teams';
 import Error from './views/Error';
 import ErrorChecker from './components/ErrorChecker'; 
 
@@ -38,6 +39,10 @@ const routes: RouteObject[] = [
           {
             path: 'resources',
             element: createElement(withAuthenticationRequired(Resources, authProps('resources'))), 
+          },
+          {
+            path: 'teams',
+            element: createElement(withAuthenticationRequired(Teams, authProps('teams'))),
           },
           {
             path: 'links',
